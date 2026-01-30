@@ -1,0 +1,183 @@
+<html>
+  <head>
+    <title>Realidade Virtual</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-particle-system-component@1.2.1/dist/aframe-particle-system-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img
+          id="imagem"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/Captura%20de%20tela%202025-01-20%20132726.png?v=1737390856407"
+        />
+        <img
+          id="imagem2"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/Captura%20de%20tela%202025-01-20%20132906.png?v=1737390968137"
+        />
+        <img
+          id="imagem3"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/Captura%20de%20tela%202025-01-20%20132949.png?v=1737391201743"
+        />
+        <img
+          id="imagem4"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/Captura%20de%20tela%202025-01-20%20133023.png?v=1737391500105"
+        />
+        <img
+          id="imagem5"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/Captura%20de%20tela%202025-01-20%20132816.png?v=1737391910044"
+        />
+
+        <!-- Sons -->
+        <audio
+          id="chuva"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/chuva-1-119168.mp3?v=1736455572561"
+        ></audio>
+        <audio
+          id="ruído-marrom"
+          src="https://cdn.glitch.global/15d5674b-6926-40f4-98d2-e534058249ad/9-relaxing-rain-water-green-noise-234514.mp3?v=1736455843569"
+        ></audio>
+      </a-assets>
+
+      <a-camera position="0 1.6 5">
+        <a-cursor color="Red"></a-cursor>
+      </a-camera>
+
+      <!-- Configuração do cubo controlado -->
+      <a-entity id="cubo" position="0 1 0">
+        <!-- Faces do cubo -->
+        <a-image
+          src="#imagem"
+          position="0 0 -1"
+          rotation="0 0 0"
+          height="2"
+          width="2"
+        ></a-image>
+        <a-image
+          src="#imagem2"
+          position="0 0 1"
+          rotation="0 180 0"
+          height="2"
+          width="2"
+        ></a-image>
+        <a-image
+          src="#imagem3"
+          position="-1 0 0"
+          rotation="0 90 0"
+          height="2"
+          width="2"
+        ></a-image>
+        <a-image
+          src="#imagem4"
+          position="1 0 0"
+          rotation="0 -90 0"
+          height="2"
+          width="2"
+        ></a-image>
+        <a-image
+          src="#imagem5"
+          position="0 1 0"
+          rotation="-90 0 0"
+          height="2"
+          width="2"
+        ></a-image>
+        <a-image
+          src="#imagem"
+          position="0 -1 0"
+          rotation="90 0 0"
+          height="2"
+          width="2"
+        ></a-image>
+      </a-entity>
+
+      <!-- Botão para tocar som de chuva -->
+      <a-sphere
+        position="-1 1.5 -2"
+        radius="0.5"
+        color="#ADD8E6"
+        event-set__click="_event: click; _target: #chuva; play"
+      ></a-sphere>
+      <a-text value="Tocar Chuva" position="-1 2.5 -2" color="#333"></a-text>
+
+      <!-- Botão para tocar ruído marrom -->
+      <a-entity
+        geometry="primitive: cone; radiusBottom: 0.5; radiusTop: 0"
+        position="-3 1.5 -2"
+        material="color: #F2C9C9"
+        event-set__click="_event: click; _target: #ruído-marrom; play"
+      ></a-entity>
+      <a-text value="Tocar som Marrom" position="-3 3 -2" color="#333"></a-text>
+
+      <!-- Botão para travar/destravar o cubo -->
+      <a-box
+        id="botao-travar"
+        position="2 1.5 -2"
+        width="0.8"
+        height="0.5"
+        depth="0.5"
+        color="#FFD700"
+      ></a-box>
+      <a-text id="texto-botao" value="Travar Cubo" position="2 2 -2" color="#333"></a-text>
+
+      <!-- Sistema de partículas de poeira -->
+      <a-entity
+        particle-system="preset: dust; particleCount: 1000; color: #ffffff; size: 0.05; opacity: 0.7; velocityValue: 0 0.5 0; positionSpread: 5 2 5; sizeRandomness: 1"
+      ></a-entity>
+
+      <!-- Ambiente -->
+      <a-entity
+        environment="preset:forest ; groundColor: #445; grid: cross"
+      ></a-entity>
+    </a-scene>
+
+    <script>
+      // Referência ao cubo e botão
+      const cubo = document.querySelector("#cubo");
+      const botaoTravar = document.querySelector("#botao-travar");
+      const textoBotao = document.querySelector("#texto-botao");
+
+      let position = { x: 0, y: 1, z: 0 };
+      let travado = false;
+
+      function updatePosition() {
+        cubo.setAttribute("position", `${position.x} ${position.y} ${position.z}`);
+      }
+
+      window.addEventListener("keydown", (event) => {
+        if (travado) return;
+
+        switch (event.key) {
+          case "ArrowUp":
+            position.z -= 0.5;
+            break;
+          case "ArrowDown":
+            position.z += 0.5;
+            break;
+          case "ArrowLeft":
+            position.x -= 0.5;
+            break;
+          case "ArrowRight":
+            position.x += 0.5;
+            break;
+          case "w":
+            position.y += 0.5;
+            break;
+          case "s":
+            position.y -= 0.5;
+            break;
+        }
+        updatePosition();
+      });
+
+      botaoTravar.addEventListener("click", () => {
+        travado = !travado;
+        botaoTravar.setAttribute(
+          "color",
+          travado ? "#FF4500" : "#FFD700"
+        );
+        textoBotao.setAttribute("value", travado ? "Destravar Cubo" : "Travar Cubo");
+      });
+    </script>
+  </body>
+</html>
